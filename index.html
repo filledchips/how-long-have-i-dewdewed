@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stopwatch Messenger Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 100px;
+    }
+    #time {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="time">00:00</div>
+
+  <button onclick="startTimer()">Start</button>
+  <button onclick="stopTimer()">Stop</button>
+  <button id="resetBtn" style="display:none;" onclick="resetTimer()">Reset</button>
+
+  <script>
+    let interval = null;
+
+    function formatTime(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return String(minutes).padStart(2, '0') + ":" +
+             String(seconds).padStart(2, '0');
+    }
+
+    function updateDisplay() {
+      const start = localStorage.getItem("startTime");
+      if (!start) return;
+
+      const now = Date.now();
+      const elapsed = now - parseInt(start);
+      document.getElementById("time").textContent = formatTime(elapsed);
+    }
+
+    function startTimer() {
+      if (!localStorage.getItem("startTime")) {
+        localStorage.setItem("startTime", Date.now());
+      }
+      if (!interval) {
+        interval = setInterval(updateDisplay, 500);
+      }
+    }
+
+    function stopTimer() {
+      const confirmStop = confirm("r u sure?");
+      if (!confirmStop) return;
+
+      const start = localStorage.getItem("startTime");
+      if (!start) return;
+
+      const elapsed = Date.now() - parseInt(start);
+      const minutes = elapsed / 60000;
+
+      let message = "";
+
+      if (minutes < 1) {
+        message = "that was quick";
+      } else if (minutes < 3) {
+        message = "you're back";
+      } else if (minutes < 5) {
+        message = "why such a long dew dew";
+      } else if (minutes < 8) {
+        message = "why so longgg";
+      } else {
+        message = "how big was the dew dew I was waiting";
+      }
+
+      // Save state so when user comes back, reset shows
+      localStorage.setItem("stopped", "true");
+
+      // Redirect to Messenger with message
+      const encoded = encodeURIComponent(message);
+      const url = "https://m.me/?text=" + encoded;
+
+      window.location.href = url;
+    }
+
+    function resetTimer() {
+      localStorage.clear();
+      location.reload();
+    }
+
+    // On load
+    window.onload = function () {
+      const start = localStorage.getItem("startTime");
+      const stopped = localStorage.getItem("stopped");
+
+      if (start && !interval) {
+        interval = setInterval(updateDisplay, 500);
+      }
+
+      if (stopped) {
+        document.getElementById("resetBtn").style.display = "inline-block";
+      }
+
+      updateDisplay();
+    };
+  </script>
+
+</body>
+</html>
