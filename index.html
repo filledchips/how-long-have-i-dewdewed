@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>dewdew timer</title>
+  <title>how long have i dewdewed?</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: Arial, sans-serif; text-align: center; margin-top: 100px; }
@@ -20,6 +20,7 @@
   <script>
     let interval = null;
 
+    // Format ms into MM:SS
     function formatTime(ms) {
       const totalSeconds = Math.floor(ms / 1000);
       const minutes = Math.floor(totalSeconds / 60);
@@ -27,13 +28,15 @@
       return String(minutes).padStart(2,'0') + ':' + String(seconds).padStart(2,'0');
     }
 
+    // Update timer display
     function updateDisplay() {
       const start = localStorage.getItem('startTime');
       if (!start) return;
-      const elapsed = Date.now() - parseInt(start);
+      const elapsed = Date.now() - parseInt(start); // always positive
       document.getElementById('time').textContent = formatTime(elapsed);
     }
 
+    // Start timer
     function startTimer() {
       if (!localStorage.getItem('startTime')) {
         localStorage.setItem('startTime', Date.now());
@@ -41,12 +44,12 @@
       if (!interval) interval = setInterval(updateDisplay, 500);
     }
 
+    // Stop timer and open Messenger to your username
     function stopTimer() {
       const start = localStorage.getItem('startTime');
       if (!start) return;
 
-      const confirmStop = confirm('r u sure?');
-      if (!confirmStop) return;
+      if (!confirm('r u sure?')) return;
 
       const elapsed = Date.now() - parseInt(start);
       const minutes = elapsed / 60000;
@@ -62,16 +65,17 @@
 
       // Direct Messenger link to your username
       const encoded = encodeURIComponent(message);
-      const url = `https://m.me/danielthetorres?text=${encoded}`;
-
+      const url = `https://www.messenger.com/t/danielthetorres?message=${encoded}`;
       window.location.href = url;
     }
 
+    // Reset timer
     function resetTimer() {
       localStorage.clear();
       location.reload();
     }
 
+    // On page load
     window.onload = function() {
       const start = localStorage.getItem('startTime');
       const stopped = localStorage.getItem('stopped');
